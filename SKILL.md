@@ -1,5 +1,5 @@
 ---
-name: optimize-parameters
+name: run-autoresearch
 description: >
   Autonomous parameter/code optimization loop for any project with a benchmark
   and evaluation script. Use when the user asks to run autoresearch, optimize
@@ -21,22 +21,22 @@ This skill implements key strategies from the autoresearch community:
 
 ## Installation
 
-If this skill is not already installed in `~/.forge/skills/optimize-parameters/`, install it:
+If this skill is not already installed in `~/.forge/skills/run-autoresearch/`, install it:
 
 ```bash
-mkdir -p ~/.forge/skills/optimize-parameters/{scripts,references}
+mkdir -p ~/.forge/skills/run-autoresearch/{scripts,references}
 curl -fsSL https://raw.githubusercontent.com/odurif0/autoresearch-optimize/master/SKILL.md \
-  -o ~/.forge/skills/optimize-parameters/SKILL.md
+  -o ~/.forge/skills/run-autoresearch/SKILL.md
 curl -fsSL https://raw.githubusercontent.com/odurif0/autoresearch-optimize/master/scripts/run_bench.sh \
-  -o ~/.forge/skills/optimize-parameters/scripts/run_bench.sh
-chmod +x ~/.forge/skills/optimize-parameters/scripts/run_bench.sh
+  -o ~/.forge/skills/run-autoresearch/scripts/run_bench.sh
+chmod +x ~/.forge/skills/run-autoresearch/scripts/run_bench.sh
 curl -fsSL https://raw.githubusercontent.com/odurif0/autoresearch-optimize/master/references/anti-patterns.md \
-  -o ~/.forge/skills/optimize-parameters/references/anti-patterns.md
+  -o ~/.forge/skills/run-autoresearch/references/anti-patterns.md
 curl -fsSL https://raw.githubusercontent.com/odurif0/autoresearch-optimize/master/references/axes.md \
-  -o ~/.forge/skills/optimize-parameters/references/axes.md
+  -o ~/.forge/skills/run-autoresearch/references/axes.md
 ```
 
-To update: re-run the commands above. To check if installed: `ls ~/.forge/skills/optimize-parameters/SKILL.md`
+To update: re-run the commands above. To check if installed: `ls ~/.forge/skills/run-autoresearch/SKILL.md`
 
 The skill is loaded at the start of each Forge session — **start a new session** after installing or updating.
 
@@ -194,7 +194,7 @@ This phase **automatically sets up** any missing prerequisites, then reads the p
 
 4. **Create `benchmark/baseline.json`** if it doesn't exist:
    ```bash
-   bash ~/.forge/skills/optimize-parameters/scripts/run_bench.sh init-baseline benchmark/baseline.json
+   bash ~/.forge/skills/run-autoresearch/scripts/run_bench.sh init-baseline benchmark/baseline.json
    ```
    This runs the benchmark with the correct warmup protocol and saves the result.
 
@@ -255,13 +255,13 @@ For each experiment in the wave:
    - Compiled: `make` or `cargo check`
 3. **Run benchmark** -- use `run_bench.sh` which applies the correct measurement protocol for the runtime profile:
    ```bash
-   bash ~/.forge/skills/optimize-parameters/scripts/run_bench.sh <exp_id> benchmark/baseline.json
+   bash ~/.forge/skills/run-autoresearch/scripts/run_bench.sh <exp_id> benchmark/baseline.json
    ```
    The script auto-detects the language, applies warmup, runs the measured benchmark, extracts metrics, evaluates against baseline, and logs to TSV.
 4. **Evaluate** -- check exit code from `run_bench.sh` (0=KEEP, 1=DISCARD, 2=ERROR).
 5. **Confirmation run** (if marginal): if primary metric delta is 2-3%, run one more time:
    ```bash
-   bash ~/.forge/skills/optimize-parameters/scripts/run_bench.sh <exp_id>-confirm benchmark/baseline.json
+   bash ~/.forge/skills/run-autoresearch/scripts/run_bench.sh <exp_id>-confirm benchmark/baseline.json
    ```
    KEEP only if the confirmation run confirms the improvement.
 6. **Decide**:

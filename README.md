@@ -1,4 +1,4 @@
-# optimize-parameters
+# run-autoresearch
 
 A **Forge skill** (not a standalone agent) for autonomous parameter/code optimization through systematic trial-and-error with automatic KEEP/DISCARD decisions. The executing agent remains **Forge** -- this skill provides the methodology, scripts, and reference material that Forge follows during optimization sessions.
 
@@ -180,7 +180,7 @@ Both must produce the **same primary metric within 0.5%**. If they don't, the be
 
 ```bash
 mkdir -p ~/.forge/skills
-git clone https://github.com/odurif0/autoresearch-optimize ~/.forge/skills/optimize-parameters
+git clone https://github.com/odurif0/autoresearch-optimize ~/.forge/skills/run-autoresearch
 ```
 
 The skill will be automatically available in Forge sessions. Invoke it by saying:
@@ -233,7 +233,7 @@ Marginal improvements (2-3%) trigger a confirmation run before KEEPing.
 ## File structure
 
 ```
-optimize-parameters/
+run-autoresearch/
 ├── SKILL.md                  # Complete workflow specification
 ├── scripts/
 │   └── run_bench.sh          # Benchmark runner with profile detection
