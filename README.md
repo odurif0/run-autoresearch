@@ -1,6 +1,6 @@
 # autoresearch-optimize
 
-A Forge skill for autonomous parameter/code optimization through systematic trial-and-error with automatic KEEP/DISCARD decisions.
+A **Forge skill** (not a standalone agent) for autonomous parameter/code optimization through systematic trial-and-error with automatic KEEP/DISCARD decisions. The executing agent remains **Forge** -- this skill provides the methodology, scripts, and reference material that Forge follows during optimization sessions.
 
 Designed as a generic, language-agnostic optimization loop: **propose change -> benchmark -> evaluate -> KEEP or DISCARD -> repeat**.
 
