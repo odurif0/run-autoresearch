@@ -142,3 +142,7 @@ Key ideas borrowed from the autoresearch community:
 ## License
 
 MIT
+
+---
+
+*Created with Deepseek V4 Pro*
