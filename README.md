@@ -65,6 +65,83 @@ That's it. Phase 0 auto-creates the rest:
 | `benchmark/baseline.json` | Created by running the benchmark |
 | `benchmark/experiments.tsv` | Created on first experiment log |
 
+## Writing a benchmark script
+
+This is the only file you need to create. Here's howto write one that works well with the optimization loop.
+
+### Required format
+
+The script must output **exactly** this pattern to stdout:
+
+```
+any log lines, warnings, progress...
+METRIC_JSON
+{"primary":-2825.5,"time_s":11.84,"success":true,"r2":0.9994,"n_peaks":12}
+```
+
+- `METRIC_JSON` on its own line signals that the next line is the JSON payload
+- The JSON line must be a single line (no pretty-printing)
+- Exit code 0 on success
+
+### Mandatory JSON fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | bool | `true` if the benchmark completed successfully |
+| `time_s` | float | Wall-clock time in seconds for the actual computation |
+
+Plus at least **one primary metric** field — this is the value the optimizer tries to improve. Name it something clear:
+
+- `bic`, `accuracy`, `primary`, `loss`, `r2`, `latency_ms`, `throughput`, `f1_score`, `mae`
+
+### Optional JSON fields
+
+Any additional metrics you want tracked in the TSV log — `r2`, `n_peaks`, `n_models`, `memory_mb`, etc.
+
+### Design principles
+
+1. **Deterministic**: Use a fixed random seed. Non-deterministic runs produce unreliable comparisons.
+2. **Self-contained**: Hardcode the test data path. Don't depend on environment variables or user input.
+3. **Reasonable duration**: 5-30 seconds is ideal. Too fast (< 1s) = noisy measurements. Too slow (> 2 min) = too few experiments per session.
+4. **Warmup-aware for JIT languages**: If using Julia/Java/C#, do a warmup run first and measure the second run. Or let `run_bench.sh` handle it (it auto-detects hybrid profiles and runs a warmup pass).
+5. **Capture failures**: If the computation fails mid-run, catch the exception and write `{"success":false, ...}` — don't crash. This lets the optimizer DISCARD gracefully instead of aborting the wave.
+6. **Sweep the full pipeline**: If your code finds multiple solutions and picks the best one, include the full sweep in the benchmark. Don't benchmark a single fixed-config run — test what the optimizer actually does.
+
+### Minimal examples
+
+**Julia:**
+```julia
+#!/usr/bin/env julia
+using MyPackage
+RNG = Random.MersenneTwister(42)
+data = MyPackage.load_data("test/data.txt")
+start = time()
+result = MyPackage.run_optimizer(data; seed=RNG)
+elapsed = time() - start
+@info "Done" elapsed_s=elapsed bic=result.bic n=result.n_components
+println("METRIC_JSON")
+println("""{"bic":$(result.bic),"time_s":$(round(elapsed;digits=3)),"success":true,"r2":$(result.r2)}""")
+```
+
+**Python:**
+```python
+#!/usr/bin/env python3
+import time, json, numpy as np
+np.random.seed(42)
+from mypackage import load_data, run_optimizer
+
+data = load_data("test/data.txt")
+start = time.time()
+result = run_optimizer(data)
+elapsed = time.time() - start
+
+print("METRIC_JSON")
+print(json.dumps({
+    "bic": result.bic, "time_s": round(elapsed, 3),
+    "success": True, "r2": result.r2
+}))
+```
+
 ## Installation
 
 ### As a Forge skill (recommended)
